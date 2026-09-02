@@ -1,0 +1,175 @@
+# Minha pequena linguagem
+
+Trabalho semestral de **Compiladores** — Ciência da Computação, UNISAGRADO.
+Prof. Luiz Ricardo Mantovani da Silva · 2026-2
+
+Cada grupo escreve um **compilador completo** para a MPL, uma linguagem
+pequena de palavras-chave em português. O compilador de vocês vai ler um
+programa em `.mpl`, atravessar as quatro fases da disciplina e produzir um
+arquivo que **roda de verdade** numa máquina virtual que vocês também vão
+escrever.
+
+No fim do semestre vocês executam um programa escrito por vocês, numa
+linguagem compilada por vocês.
+
+---
+
+## Comece por aqui
+
+```bash
+git clone https://github.com/LuizRMSilva1973/compiladores-lab.git
+cd compiladores-lab
+```
+
+```bash
+make verificar E=1
+```
+
+Vai dar vermelho — é para dar. O esqueleto responde à linha de comando mas
+ainda não tem nenhuma fase escrita. O vermelho é o seu ponto de partida, e
+ele vai virando verde conforme vocês preenchem `mplc/`.
+
+Não precisa instalar nada além do Python 3. Se o notebook de vocês der
+trabalho, o [Google Cloud Shell](https://shell.cloud.google.com) já vem com
+Python 3.12, Java 21 e git — e é o mesmo ambiente da correção.
+
+---
+
+## Os três documentos que mandam
+
+| Arquivo | O que decide |
+|---|---|
+| [LINGUAGEM.md](LINGUAGEM.md) | **o que** o compilador aceita: a sintaxe e as regras de tipo da MPL |
+| [CONTRATOS.md](CONTRATOS.md) | **como** ele se comunica: a linha de comando e o formato de cada despejo |
+| [entregas/](entregas/) | o enunciado de cada entrega, com o que vale nota |
+
+Quando a sua intuição discordar de um deles, é o arquivo que vale. Se o
+arquivo estiver errado, me procurem — já aconteceu de eu escrever um exemplo
+errado no contrato e só descobrir rodando.
+
+---
+
+## As entregas
+
+| # | Entrega | Turma A (quarta) | Turma B (segunda) | Vale |
+|---|---|---|---|---|
+| [E1](entregas/E1.md) | Analisador léxico | 02/09 | 31/08 | 0,8 |
+| [E2](entregas/E2.md) | Analisador sintático e árvore | 30/09 | 28/09 | 1,2 |
+| [E3](entregas/E3.md) | Tabela de símbolos e tipos | 28/10 | 26/10 | 1,2 |
+| [E4](entregas/E4.md) | Código intermediário, geração e VM | 18/11 | 16/11 | 1,8 |
+| [Apres.](entregas/APRESENTACAO.md) | Demonstração e defesa | 25/11 | 23/11 | 1,0 |
+
+São **quatro entregas sobre o mesmo compilador**, não quatro trabalhos. O que
+vocês escreverem na E1 continua rodando na E4 — e o verificador da E4 confere
+tudo o que veio antes. Deixar a E1 pela metade custa caro em novembro.
+
+---
+
+## Regras do jogo
+
+**A entrega é o repositório, nunca a máquina de vocês.** A correção clona o
+repositório numa máquina limpa e roda `make verificar E=n`. Se não passar
+lá, não conta como entregue. Testem antes de entregar — de preferência na
+Cloud Shell, que é o ambiente da correção.
+
+**Grupos de até 3.** O mesmo grupo do começo ao fim. Mudança de grupo só até
+a E1.
+
+**Gerador de parser proibido nas Entregas 1 e 2.** ANTLR, PLY, yacc, lark e
+parentes escondem exatamente a parte que está sendo ensinada. Da E3 em diante
+o assunto é outro, e aí não faz diferença. Na apresentação vocês podem — e
+devem — comparar o parser de vocês com o que um gerador produziria.
+
+**A linguagem de implementação é de vocês, entre as que o ambiente da correção
+já tem:** Python 3.12, Java 21, C e C++ (gcc 13), Ruby 3.2 ou PHP 8.3. O
+verificador não olha para dentro — ele roda `./compilar` e `./executar` e
+compara o que sai. O esqueleto em `mplc/` é Python porque é o caminho mais
+curto, mas ninguém é obrigado a usá-lo.
+
+A lista existe por um motivo prático: a correção roda numa Cloud Shell limpa, e
+o que não estiver lá não roda. Querem outra linguagem? Falem comigo **antes** de
+começar — o critério é ela existir no ambiente sem instalação. Em nenhum caso
+dependam de biblioteca externa: só a biblioteca padrão.
+
+**Escrever o compilador é a tarefa.** Usar IA para explicar um conceito,
+revisar uma mensagem de erro ou entender um trecho é bem-vindo, e eu faço
+isso também. Entregar um compilador que vocês não sabem alterar é outra
+coisa — e a apresentação foi desenhada para separar os dois casos: cada grupo
+recebe **uma alteração pequena na linguagem, na hora, com 10 minutos para
+fazer**. Quem escreveu o compilador faz. Não é desconfiança; é o formato.
+
+---
+
+## O verificador
+
+```bash
+make verificar E=2      # confere a Entrega 2 e, junto, a 1
+make verificar          # confere as quatro
+make evidencias E=2     # grava evidencias/verificacao-2.txt, que vai na entrega
+```
+
+**Antes de entregar, rodem `make prova`.** Ele clona o repositório de vocês num
+diretório limpo e verifica lá — que é exatamente o que a correção faz. É o
+teste que pega o defeito mais comum de todos, e que não tem nada a ver com
+compiladores: *funciona aqui e não no clone*. Arquivo esquecido fora do commit,
+caminho absoluto, passo de compilação que ninguém roda. Vale para qualquer
+linguagem, e é a única prova que realmente antecipa a correção.
+
+Ele não lê o código de vocês. Ele roda o compilador e compara a saída com um
+corpus de **10 programas válidos**, **26 programas que precisam ser
+recusados na compilação** e **3 que precisam falhar na execução** — com a
+fase e a linha do erro conferidas.
+
+Os programas recusados são metade da nota escondida do trabalho. Um
+compilador que aceita tudo passa em todos os testes positivos e não vale
+nada: é por isso que o corpus tem mais programas errados do que certos.
+
+**A correção usa um segundo corpus, que vocês não têm.** Mesma linguagem,
+mesmas regras, programas diferentes. Um compilador de verdade passa nos dois
+sem que vocês precisem fazer nada; um programa que apenas reproduza as saídas
+esperadas deste corpus passa aqui e reprova lá. Estou dizendo isto abertamente
+para ninguém perder tempo pelo caminho errado.
+
+---
+
+## Especificação do Analisador Léxico (Entrega 1)
+
+A etapa léxica foi projetada utilizando uma arquitetura orientada a objetos baseada na classe `AnalisadorLexico` (`mplc/lexico.py`). O scanner processa o fluxo de caracteres caractere a caractere mantendo controle de linha, coluna e cursores absolutos.
+
+Espaços em branco (`' '`, `\t`, `\r`, `\n`) e comentários (`//` e `/* ... */`) são consumidos sem emitir tokens na saída.
+
+### Mapeamento Léxico e Categorias
+
+| Categoria | Token (`TIPO`) | Padrão Reconhecido | Exemplo de Lexema |
+|---|---|---|---|
+| Comentário de Linha | *(ignorado)* | `//` até o caractere de nova linha `\n` | `// instrucao` |
+| Comentário de Bloco | *(ignorado)* | `/*` até encontrar o delimitador `*/` | `/* bloco explicativo */` |
+| Identificador | `ID` | Inicia com `[a-zA-Z_]` seguido por `[a-zA-Z0-9_]*` | `total`, `contador_1`, `seletor` |
+| Palavras Reservadas | `FUNCAO`, `RETORNE`, `SE`, `SENAO`, `ENQUANTO`, `ESCREVA` | Palavras-chave de controle e I/O | `funcao`, `se`, `escreva` |
+| Tipos Primitivos | `TIPO_INTEIRO`, `TIPO_REAL`, `TIPO_LOGICO`, `TIPO_TEXTO`, `TIPO_VAZIO` | Tipos suportados pelo compilador | `inteiro`, `real`, `logico`, `texto`, `vazio` |
+| Operadores Lógicos | `E`, `OU`, `NAO` | Conectivos booleanos em português | `e`, `ou`, `nao` |
+| Literais Inteiros | `INTEIRO` | Sequência contínua de dígitos decimais `[0-9]+` | `0`, `1024` |
+| Literais Reais | `REAL` | `[0-9]+\.[0-9]+` (ponto com dígitos à esquerda e à direita) | `3.1415`, `0.5` |
+| Literais Lógicos | `LOGICO` | `verdadeiro` \| `falso` | `verdadeiro`, `falso` |
+| Literais de Texto | `TEXTO` | String delimitada por `"..."` na mesma linha com escapes `\n`, `\t`, `\"`, `\\` | `"resultado = \t10"` |
+| Operadores Aritméticos | `MAIS`, `MENOS`, `VEZES`, `DIVIDE`, `RESTO` | Símbolos matemáticos: `+`, `-`, `*`, `/`, `%` | `+`, `*`, `%` |
+| Operadores Relacionais | `IGUAL`, `DIFERENTE`, `MENOR`, `MENOR_IGUAL`, `MAIOR`, `MAIOR_IGUAL` | Comparações: `==`, `!=`, `<`, `<=`, `>`, `>=` | `==`, `<=`, `>` |
+| Atribuição | `ATRIBUI` | Operador `=` | `=` |
+| Pontuação / Delimitadores | `ABRE_PAR`, `FECHA_PAR`, `ABRE_CHAVE`, `FECHA_CHAVE`, `VIRGULA`, `PONTO_VIRGULA` | Símbolos estruturais: `(`, `)`, `{`, `}`, `,`, `;` | `(`, `}`, `;` |
+| Fim de Arquivo | `FIM_ARQUIVO` | Marcador posicionado logo após o último caractere do fonte | `(lexema vazio)` |
+
+### Regras de Desambiguação
+1. **Prioridade de Operadores Compostos**: Operadores de dois caracteres (`==`, `!=`, `<=`, `>=`) são verificados antes de seus equivalentes unários (`=`, `<`, `>`) para evitar tokenização fracionada indevida.
+2. **Máximo Munch (Maior Casamento)**: Sequências alfanuméricas são consumidas inteiramente antes da busca na tabela de palavras reservadas (ex.: identificador `seletor` é identificado como `ID`, e não `SE` seguido de `ID`).
+
+---
+
+## Como entregar
+
+1. `git push` no repositório do grupo.
+2. Abram a [página do trabalho](https://profluiz.mantovanitec.com/disciplinas/aulas/compiladores/trabalho.html).
+3. No formulário do fim da página: escolham a entrega, identifiquem os
+   integrantes (nome, RA e e-mail), colem a URL do repositório e anexem o
+   `evidencias/verificacao-N.txt`.
+4. Cada integrante recebe uma cópia por e-mail. **Guardem esse e-mail**: é o
+   comprovante.
