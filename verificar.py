@@ -77,9 +77,20 @@ class Placar:
         print(f'         esperado: {CINZA}{esperado}{ZERO}')
         print(f'         veio:     {CINZA}{veio}{ZERO}')
 
+if sys.platform == 'win32':
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8')
+
 def rodar(cmd, entrada=None, limite=20):
     try:
-        p = subprocess.run(cmd, cwd=RAIZ, capture_output=True, text=True, timeout=limite)
+        if sys.platform == 'win32':
+            if cmd and cmd[0] == './compilar':
+                cmd = [sys.executable, '-m', 'mplc.principal'] + cmd[1:]
+            elif cmd and cmd[0] == './executar':
+                cmd = [sys.executable, '-m', 'mplc.principal', '--rodar'] + cmd[1:]
+        p = subprocess.run(cmd, cwd=RAIZ, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=limite)
         return p.returncode, p.stdout, p.stderr
     except subprocess.TimeoutExpired:
         return 124, '', f'passou de {limite} s sem terminar'
